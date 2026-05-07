@@ -10,16 +10,10 @@ from utils.grok_client import GrokCodeAssistant
 from utils.loader import extract_zip, read_code_files, scan_code_files
 from utils.retriever import CodeRetriever
 
-
-# ---------------- PAGE CONFIG ---------------- #
-
 st.set_page_config(
     page_title="Codebase Intelligence Chatbot",
     layout="wide"
 )
-
-
-# ---------------- SESSION STATE ---------------- #
 
 def initialize_state():
     defaults = {
@@ -35,9 +29,6 @@ def initialize_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
-
-# ---------------- CLEAR DATA ---------------- #
-
 def clear_project_data(embedding_store):
     embedding_store.clear_store()
 
@@ -47,9 +38,6 @@ def clear_project_data(embedding_store):
     st.session_state.indexed_files = 0
     st.session_state.indexed_chunks = 0
     st.session_state.last_retrieved = []
-
-
-# ---------------- INDEX PROJECT ---------------- #
 
 def index_uploaded_project(uploaded_zip, embedding_store):
 
@@ -67,32 +55,23 @@ def index_uploaded_project(uploaded_zip, embedding_store):
 
         extract_dir.mkdir(parents=True, exist_ok=True)
 
-        # Extract ZIP
         project_root = extract_zip(
             str(zip_path),
             str(extract_dir)
         )
 
-        # Scan files
         file_paths = scan_code_files(project_root)
 
-        # Read files
         documents = read_code_files(file_paths)
 
-        # Chunk files
         chunks = create_code_chunks(documents)
 
-        # Build FAISS index
         total_chunks = embedding_store.build_index(chunks)
 
-        # Update state
         st.session_state.project_root = project_root
         st.session_state.index_ready = True
         st.session_state.indexed_files = len(documents)
         st.session_state.indexed_chunks = total_chunks
-
-
-# ---------------- MAIN APP ---------------- #
 
 def main():
 
@@ -106,10 +85,8 @@ def main():
 
     st.caption(
         "RAG Pipeline using Streamlit + FAISS + "
-        "Sentence Transformers + Groq API"
+        "Sentence Transformers + Grok API"
     )
-
-    # ---------------- SIDEBAR ---------------- #
 
     with st.sidebar:
 
@@ -120,7 +97,6 @@ def main():
             type=["zip"]
         )
 
-        # INDEX BUTTON
         if uploaded_zip is not None:
 
             if st.button(
@@ -163,7 +139,6 @@ def main():
             f"Chunks Indexed: {st.session_state.indexed_chunks}"
         )
 
-        # CLEAR BUTTON
         if st.button(
             "Clear Vector Database",
             use_container_width=True
@@ -182,8 +157,6 @@ def main():
                 st.error(
                     f"Failed to clear database: {str(e)}"
                 )
-
-    # ---------------- PROJECT SUMMARY ---------------- #
 
     st.subheader("Project Summary")
 
@@ -208,24 +181,19 @@ def main():
             "'Index Project' first."
         )
 
-    # ---------------- CHAT SECTION ---------------- #
-
     st.subheader("Chat")
 
-    # Display chat history
     for message in st.session_state.messages:
 
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Chat input
     user_question = st.chat_input(
         "Ask questions about the codebase..."
     )
 
     if user_question:
 
-        # Store user message
         st.session_state.messages.append({
             "role": "user",
             "content": user_question
@@ -234,7 +202,6 @@ def main():
         with st.chat_message("user"):
             st.markdown(user_question)
 
-        # Check if project indexed
         if not st.session_state.index_ready:
 
             answer = (
@@ -252,7 +219,6 @@ def main():
 
             return
 
-        # Generate answer
         with st.chat_message("assistant"):
 
             with st.spinner(
@@ -261,7 +227,6 @@ def main():
 
                 try:
 
-                    # Retrieve relevant chunks
                     retriever = CodeRetriever(
                         embedding_store
                     )
@@ -273,12 +238,10 @@ def main():
 
                     st.session_state.last_retrieved = retrieved
 
-                    # Groq LLM
                     assistant = GrokCodeAssistant(
-                        model="llama3-8b-8192"
+                        model="grok-3-mini"
                     )
 
-                    # Generate answer
                     answer = assistant.answer_question(
                         user_question,
                         retrieved
@@ -296,8 +259,6 @@ def main():
                     "role": "assistant",
                     "content": answer
                 })
-
-    # ---------------- RETRIEVED CONTEXT ---------------- #
 
     if st.session_state.last_retrieved:
 
@@ -319,9 +280,6 @@ def main():
                 st.caption(
                     f"Path: {item['file_path']}"
                 )
-
-
-# ---------------- RUN APP ---------------- #
 
 if __name__ == "__main__":
     main()
