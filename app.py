@@ -85,7 +85,7 @@ def main():
 
     st.caption(
         "RAG Pipeline using Streamlit + FAISS + "
-        "Sentence Transformers + Grok API"
+        "Sentence Transformers + Groq API"
     )
 
     with st.sidebar:
@@ -239,7 +239,7 @@ def main():
                     st.session_state.last_retrieved = retrieved
 
                     assistant = GrokCodeAssistant(
-                        model="grok-3-mini"
+                        model="llama-3.1-8b-instant"
                     )
 
                     answer = assistant.answer_question(
