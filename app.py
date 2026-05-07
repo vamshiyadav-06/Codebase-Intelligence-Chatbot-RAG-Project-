@@ -84,8 +84,7 @@ def main():
     st.title("Codebase Intelligence Chatbot")
 
     st.caption(
-        "RAG Pipeline using Streamlit + FAISS + "
-        "Sentence Transformers + Groq API"
+        "RAG Pipeline using Streamlit + FAISS + Sentence Transformers + Groq API"
     )
 
     with st.sidebar:
@@ -104,9 +103,7 @@ def main():
                 use_container_width=True
             ):
 
-                with st.spinner(
-                    "Indexing project..."
-                ):
+                with st.spinner("Indexing project..."):
 
                     try:
                         index_uploaded_project(
@@ -177,8 +174,7 @@ def main():
 
     else:
         st.warning(
-            "Upload a ZIP file and click "
-            "'Index Project' first."
+            "Upload a ZIP file and click 'Index Project' first."
         )
 
     st.subheader("Chat")
@@ -204,10 +200,7 @@ def main():
 
         if not st.session_state.index_ready:
 
-            answer = (
-                "Please upload and index "
-                "a project first."
-            )
+            answer = "Please upload and index a project first."
 
             st.session_state.messages.append({
                 "role": "assistant",
@@ -239,7 +232,7 @@ def main():
                     st.session_state.last_retrieved = retrieved
 
                     assistant = GrokCodeAssistant(
-                        model="llama-3.1-8b-instant"
+                        model="mixtral-8x7b-32768"
                     )
 
                     answer = assistant.answer_question(
