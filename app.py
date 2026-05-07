@@ -1,3 +1,4 @@
+```python id="kr8z1m"
 import shutil
 import tempfile
 from pathlib import Path
@@ -232,7 +233,7 @@ def main():
                     st.session_state.last_retrieved = retrieved
 
                     assistant = GrokCodeAssistant(
-                        model="mixtral-8x7b-32768"
+                        model="llama3-70b-8192"
                     )
 
                     answer = assistant.answer_question(
@@ -276,3 +277,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
