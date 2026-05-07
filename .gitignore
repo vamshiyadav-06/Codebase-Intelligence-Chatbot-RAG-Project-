@@ -1,0 +1,6 @@
+.env
+__pycache__/
+.venv/
+data/extracted_project/
+vector_store/faiss.index
+vector_store/metadata.json
